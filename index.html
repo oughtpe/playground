@@ -4,57 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Horseman Model</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/OBJLoader.js"></script>
-    <style>
-        body {
-            background-color: red;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+    
+    
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.136/build/three.module.js",
+                "three/examples/jsm/loaders/OBJLoader": "https://cdn.jsdelivr.net/npm/three@0.136/examples/jsm/loaders/OBJLoader.js"
+            }
         }
-        canvas {
-            display: block;
+    </script>
+
+    <script type="module">
+        // Import Map을 통해 모듈 불러오기
+        import * as THREE from 'three';
+        import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+    
+        let scene, camera, renderer, model;
+
+        function init() {
+            // Three.js 기본 설정
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(1, 50, -100);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // 조명 추가
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(1, 1, 1).normalize();
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7)); // 🔥 추가된 조명
+            scene.background = new THREE.Color(0xff0000); // 배경을 흰색으로 변경
+
+
+            // OBJ 파일 로드
+            const loader = new OBJLoader();
+            loader.load('https://oughtpe.github.io/playground/Horseman.obj', function (object) {
+                object.scale.set(0.7, 0.5, 0.5);
+                object.position.set(0, 33, 0);
+                scene.add(object);
+                model = object;
+            });
+
+            animate();
         }
-    </style>
-</head>
-<body>
-    <script>
-        // Three.js 기본 설정
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // 조명 추가
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 1).normalize();
-        scene.add(light);
-
-        // OBJ 파일 로드
-        const loader = new THREE.OBJLoader();
-        loader.load('https://oughtpe.github.io/playground/Horseman.obj', function (object) {
-            object.scale.set(0.5, 0.5, 0.5); // 크기 조정
-            object.position.set(0, -1, 0); // 위치 조정
-            scene.add(object);
-        });
-
-        // 카메라 위치
-        camera.position.z = 5;
-
-        // 애니메이션 루프
         function animate() {
             requestAnimationFrame(animate);
+            if (model) model.rotation.y += 0.01; // 🔥 모델 회전 추가
             renderer.render(scene, camera);
         }
-        animate();
 
-        // 창 크기 변경 대응
         window.addEventListener('resize', function () {
             const width = window.innerWidth;
             const height = window.innerHeight;
@@ -62,6 +66,27 @@
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
         });
+
+        init();
     </script>
+
+
+    <style>
+        body {
+            background-color: rgb(255, 255, 255);
+            margin: 0;
+            overflow: hidden;
+        }
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>hello~ baby</h1>
 </body>
 </html>
